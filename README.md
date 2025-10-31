@@ -15,24 +15,21 @@ server.py
 ```
 import socket
 
-server = socket.socket()
-server.bind(('localhost', 8000))
-server.listen(1)
-print("Server is listening...")
-conn, addr = server.accept()
-print(f"Connected with {addr}")
+s = socket.socket()
+s.bind(('localhost', 8000))   
+s.listen(5)
+c, addr = s.accept()
+print("Connected with", addr)
 
 while True:
-    data = conn.recv(1024).decode()
-
-    if data:
-        print(f"Received: {data}")
-        conn.send("ACK".encode())
-
-        if data.lower() == 'exit':  
-            print("Connection closed by client")
-            conn.close()
-            break
+    i = input("Enter data: ")
+    c.send(i.encode())
+    ack = c.recv(1024).decode()
+    if ack:
+        print("Server received:", ack)
+    else:
+        c.close()
+        break
 
 ```
 
@@ -41,36 +38,21 @@ client.py
 
 ```
 import socket
-import time
 
-client = socket.socket()
-client.connect(('localhost', 8000))
-client.settimeout(5)  
-
+s = socket.socket()
+s.connect(('localhost', 8000))   
 while True:
-    msg = input("Enter a message (or type 'exit' to quit): ")
-
-    client.send(msg.encode())  
-
-    if msg.lower() == 'exit':  
-        print("Connection closed by client")
-        client.close()
+    data = s.recv(1024).decode()
+    if not data:
         break
-
-    try:
-        ack = client.recv(1024).decode()
-        if ack == "ACK":
-            print(f"Server acknowledged: {ack}")
-    except socket.timeout:
-        print("No ACK received, retransmitting...")
-        continue
-
-
+    print("Client received:", data)
+    s.send("Acknowledgement Received".encode())
 ```
 
 ## OUTPUT
 
-<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/e478ab67-bd95-4078-89ee-cc3958edf280" />
+<img width="1916" height="1142" alt="image" src="https://github.com/user-attachments/assets/62c17bdf-0794-40d1-8ea4-286ae90b3c35" />
+
 
 ## RESULT
 Thus, python program to perform stop and wait protocol was successfully executed.
